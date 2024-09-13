@@ -8,11 +8,13 @@ with open('pix3d.json', 'r') as f:
 resized_img_head = '../resized_images'
 model_head = '../model'
 
-
 image_to_model_map = {}
 
-
 for item in metadata:
+
+    if 'SS' in item['model']:
+        print(f"Skipping {item['model']} due to missing .mtl file.")
+        continue
 
     orig_img_path = item['img'].replace('img/', '')
     img_full_path = os.path.join(resized_img_head, orig_img_path)

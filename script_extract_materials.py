@@ -5,13 +5,25 @@ def extract_materials(mtl_file):
     materials = {}
     cur_material = None
 
+    default_materials = {
+        'diffuse': [1.0, 1.0, 1.0],  
+        'shininess': 96.078431,       
+        'ambient': [0.0, 0.0, 0.0],  
+        'specular': [0.0, 0.0, 0.0], 
+        'transparency': 1.0,      
+        'illumination': 2 
+    }
+
     with open(mtl_file, 'r') as f:
         for line in f:
             line = line.strip()
 
+            if not line or line.startswith('#'):
+                continue
+
             if line.startswith('newmtl'):
                 cur_material = line.split()[1]
-                materials[cur_material] = {}
+                materials[cur_material] = default_materials.copy()
 
             # Diffuse Color
             elif line.startswith('Kd'):
@@ -38,20 +50,41 @@ def extract_materials(mtl_file):
                 transparency = float(line.split()[1])
                 materials[cur_material]['transparency'] = transparency
 
+            elif line.startswith('map_Kd'):
+                texture_map = line.split()[1]
+                materials[cur_material]['texture_map'] = texture_map
+
+            elif line.startswith('illum'):
+                illumination = int(line.split()[1])
+                materials[cur_material]['illumination'] = illumination
+
     return materials
 
 def process_through_directory(directory):
     material_map = {}
 
     for root, dirs, files in os.walk(directory):
+        mtl_file_path = None
+
+        # Skip directories with "SS" prefix in file names
+        if any('SS' in file for file in files):
+            print(f"Skipping {root} due to missing or SS-prefixed models.")
+            continue
+
         for file in files:
             if file.endswith('.mtl'):
                 mtl_file_path = os.path.join(root, file)
+                break
 
-                material_properties = extract_materials(mtl_file_path)
+        if mtl_file_path:
+            material_properties = extract_materials(mtl_file_path)
 
-                relative_path = os.path.relpath(mtl_file_path, directory)
-                material_map[relative_path] = material_properties
+            for file in files:
+                if file.endswith('_simple_normal.obj'):
+                    obj_file_path = os.path.join(root, file)
+                    
+                    rel_path = os.path.relpath(obj_file_path, directory)
+                    material_map[rel_path] = material_properties
 
     return material_map
 
