@@ -24,26 +24,47 @@ def simplify_mesh(mesh, target_faces=1000):
     return trimesh.Trimesh(vertices=simplified_mesh.vertex_matrix(), faces=simplified_mesh.face_matrix())
 
 # Iterate over the pix3d metadata
-for item in metadata:
-    model_rel_path = item['model']  # Get the relative path to the 3D model
-    model_full_path = model_rel_path.replace('model', '../model', 1)  # Modify the base path as needed
+# for item in metadata:
+#     model_rel_path = item['model']  # Get the relative path to the 3D model
+#     model_full_path = model_rel_path.replace('model', '../model', 1)  # Modify the base path as needed
 
-    # Check if the model exists
-    if os.path.exists(model_full_path):
-        print(f"Processing model: {model_full_path}")
+#     # Check if the model exists
+#     if os.path.exists(model_full_path):
+#         print(f"Processing model: {model_full_path}")
         
-        # Load the mesh
-        mesh = trimesh.load(model_full_path)
+#         # Load the mesh
+#         mesh = trimesh.load(model_full_path)
 
-        # Normalize the mesh
-        normal_mesh = normalize_mesh(mesh)
+#         # Normalize the mesh
+#         normal_mesh = normalize_mesh(mesh)
 
-        # Simplify the mesh
-        simple_mesh = simplify_mesh(normal_mesh)
+#         # Simplify the mesh
+#         simple_mesh = simplify_mesh(normal_mesh)
 
-        # Define output path for the simplified model
-        output_path = model_full_path.replace('.obj', '_simple_normal.obj')
-        simple_mesh.export(output_path)
-        print(f"Simplified model saved to: {output_path}")
-    else:
-        print(f"Model not found: {model_full_path}")
+#         # Define output path for the simplified model
+#         output_path = model_full_path.replace('.obj', '_simple_normal.obj')
+#         simple_mesh.export(output_path)
+#         print(f"Simplified model saved to: {output_path}")
+#     else:
+#         print(f"Model not found: {model_full_path}")
+
+model_to_fix = '../model/chair/IKEA_SOLSTA_OLARP/model.obj'
+
+if os.path.exists(model_to_fix):
+    print(f"Processing model: {model_to_fix}")
+    
+    # Load the mesh
+    mesh = trimesh.load(model_to_fix)
+
+    # Normalize the mesh
+    normal_mesh = normalize_mesh(mesh)
+
+    # Simplify the mesh
+    simple_mesh = simplify_mesh(normal_mesh)
+
+    # Define output path for the simplified model
+    output_path = model_to_fix.replace('.obj', '_simple_normal.obj')
+    simple_mesh.export(output_path)
+    print(f"Simplified model saved to: {output_path}")
+else:
+    print(f"Model not found: {model_to_fix}")
